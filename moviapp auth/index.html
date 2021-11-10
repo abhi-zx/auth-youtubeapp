@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+        body{
+            background: url('https://d1csarkz8obe9u.cloudfront.net/posterpreviews/movie-poster-template-design-21a1c803fe4ff4b858de24f5c91ec57f_screen.jpg?ts=1574144362');
+        }
+        *{
+            margin:0;
+            padding:0;
+        }
+        .navbar{
+            background-color:grey;
+            display: flex;
+            width: 100%;
+            height: 50px;
+            border: 1px solid black;
+            justify-content:space-between;
+            cursor: pointer;
+            /* color:white; */
+        }
+        .signup span{
+            margin-right: 15px;
+            cursor: pointer;
+            
+        }
+        .signup span:hover{
+            font-size:30px;
+        }
+        input {
+            width: 200px;
+        }
+
+        .movies1 {
+            height: 200px;
+            width: 205px;
+            border: 1px solid black;
+            overflow: scroll;
+            border-top: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        img {
+            height: 200px;
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+       
+        <div class="home">
+            <span id="home">Home</span>
+        </div>
+        <div class="signup">
+            <span id='login'>Login</span>
+           
+        </div>
+    </div>
+    <input oninput="debounce(main, 1000)" type="text" id='movie' placeholder='enter movies name'>
+    <button>Search</button>
+    <div class="container">
+        <div id="movies"></div>
+        <div id='list'></div>  
+    </div>
+
+
+
+
+    <script>
+
+        // input se debounce  ---> debounce se main --> main se searchMovies, wha fetch movies details ---> 
+        // phir main k hi andr se append using movies data of fetch  
+
+
+        var timerId;
+        let movies_div = document.getElementById('movies')
+        async function searchMovies(movies_name) {
+            try {
+                var res = await fetch(`http://www.omdbapi.com/?apikey=173483b6&s=${movies_name}`)
+                var data = await res.json();
+                return data;
+            }
+            catch (e) {
+                console.log(e)
+            }
+
+            // console.log(data)
+        }
+        // searchMovies('matrix')
+        function appendMovies(movies) {
+            if (movies === undefined) {
+                return false;
+            }
+            movies_div.innerHTML = null
+            movies.forEach(function (movie) {
+
+                var p = document.createElement('p');
+                p.addEventListener('click', showlist);
+                function showlist() {
+                    var details = movies;
+                    console.log(p)
+                    // var name = document.getElementById('movie').value;
+                    movies_div.innerHTML = null
+                    movies_div.classList.remove('movies1')
+                    // console.log(movies)
+                    for (key in details) {
+                        if (details[key].Title == p.textContent) {
+                            var list = document.getElementById('list');
+                            list.innerHTML = null;
+                            var img = document.createElement('img');
+                            img.src = details[key].Poster;
+                            var p1 = document.createElement('p');
+                            p1.textContent = details[key].Title;
+                            var p2 = document.createElement('p');
+                            p2.textContent = details[key].Rating;
+                            list.append(img, p1, p2);
+                            console.log(details[key])
+                            // details[key].
+                        }
+                    }
+
+                }
+                p.innerText = movie.Title;
+                movies_div.append(p);
+
+            })
+
+        }
+
+        async function main() {
+            var name = document.getElementById('movie').value;
+            movies_div.classList.add('movies1')
+
+            let res = await searchMovies(name);
+            appendMovies(res.Search)
+            console.log('res: ', res);
+        }
+
+        function debounce(func, delay) {
+
+            if (timerId) {
+                clearTimeout(timerId)
+            }
+
+            timerId = setTimeout(function () {
+                func();
+            }, delay)
+
+
+        }
+    </script>
+</body>
+
+</html>
